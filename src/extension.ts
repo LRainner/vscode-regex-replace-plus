@@ -37,6 +37,14 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider(SidebarProvider.viewId, provider)
   );
+
+  // 注册命令
+  context.subscriptions.push(
+    vscode.commands.registerCommand('regex-replace-plus.start', () => {
+      // 当命令被执行时，聚焦到我们的侧边栏视图
+      vscode.commands.executeCommand('workbench.view.extension.regex-replace-plus-activitybar');
+    })
+  );
 }
 
 // This method is called when your extension is deactivated

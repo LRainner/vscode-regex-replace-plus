@@ -10,16 +10,23 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:regex-replace-plus.start"
+    "onView:regexReplacePlusSidebar"
   ],
   "main": "./dist/extension.js",
   "contributes": {
+    "commands": [
+      {
+        "command": "regex-replace-plus.start",
+        "title": "Start Regex Replace Plus",
+        "category": "RegexReplacePlus"
+      }
+    ],
     "viewsContainers": {
       "activitybar": [
         {
           "id": "regex-replace-plus-activitybar",
           "title": "Regex Replace Plus",
-          "icon": "$(replace-all)"
+          "icon": "media/icon.svg"
         }
       ]
     },

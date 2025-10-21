@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="main.css">
+    <title>Regex Replace Plus</title>
+</head>
+<body>
+    <div class="container">
+        <div class="input-group">
+            <label for="regex-input">查找 (正则表达式)</label>
+            <input type="text" id="regex-input" placeholder="输入正则表达式">
+        </div>
+        <div class="input-group">
+            <label for="replace-input">替换为</label>
+            <textarea id="replace-input" rows="3" placeholder="输入替换内容, e.g., item_{{i:1}}"></textarea>
+        </div>
+        <button id="replace-all-btn">全部替换</button>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

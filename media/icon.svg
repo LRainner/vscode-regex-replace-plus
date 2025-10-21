@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <defs>
+    <style>
+      .text {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        font-size: 28px;
+        font-weight: bold;
+        fill: currentColor;
+      }
+      .arrow {
+        fill: currentColor;
+      }
+    </style>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="100" height="100" fill="none"/>
+  
+  <!-- ".*" for Regex -->
+  <text x="10" y="40" class="text">.*</text>
+  
+  <!-- Arrow for Replace -->
+  <path class="arrow" d="M 45,55 L 85,55 L 85,45 L 95,60 L 85,75 L 85,65 L 45,65 Z" />
+  
+  <!-- "i++" for Increment -->
+  <text x="10" y="80" class="text">i++</text>
+</svg>
