@@ -2,9 +2,9 @@
   "name": "regex-replace-plus",
   "displayName": "regex-replace-plus",
   "description": "Enhance VS Code replace with incremental numbering.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "engines": {
-    "vscode": "^1.105.0"
+    "vscode": "^1.100.0"
   },
   "repository": {
     "type": "git",
@@ -60,7 +60,7 @@
     "test": "vscode-test"
   },
   "devDependencies": {
-    "@types/vscode": "^1.105.0",
+    "@types/vscode": "^1.100.0",
     "@types/mocha": "^10.0.10",
     "@types/node": "22.x",
     "@typescript-eslint/eslint-plugin": "^8.45.0",
