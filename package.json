@@ -10,6 +10,7 @@
     "type": "git",
     "url": "https://github.com/LRainner/vscode-regex-replace-plus.git"
   },
+  "publisher": "LRainner",
   "categories": [
     "Other"
   ],
