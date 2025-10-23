@@ -10,6 +10,11 @@ const replaceAllButton = document.getElementById('replace-all-btn');
 const errorMessage = document.getElementById('error-message');
 const matchCount = document.getElementById('match-count');
 
+// 页面加载完成后自动聚焦到查找输入框
+window.addEventListener('load', () => {
+    regexInput.focus();
+});
+
 // 3. 监听输入框的输入事件
 regexInput.addEventListener('input', () => {
     vscode.postMessage({
