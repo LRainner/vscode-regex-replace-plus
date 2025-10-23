@@ -2,7 +2,7 @@
   "name": "regex-replace-plus",
   "displayName": "regex-replace-plus",
   "description": "Enhance VS Code replace with incremental numbering.",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "engines": {
     "vscode": "^1.100.0"
   },
