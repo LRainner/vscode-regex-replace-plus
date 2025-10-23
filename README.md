@@ -1,7 +1,7 @@
 # Regex Replace Plus
 
-[![Version](https://img.shields.io/visual-studio-marketplace/v/your-publisher.regex-replace-plus.svg)](https://marketplace.visualstudio.com/items?itemName=your-publisher.regex-replace-plus)
-[![Installs](https://img.shields.io/visual-studio-marketplace/i/your-publisher.regex-replace-plus.svg)](https://marketplace.visualstudio.com/items?itemName=your-publisher.regex-replace-plus)
+[![Version](https://img.shields.io/visual-studio-marketplace/v/your-publisher.regex-replace-plus.svg)](https://marketplace.visualstudio.com/items?itemName=LRainner.regex-replace-plus)
+[![Installs](https://img.shields.io/visual-studio-marketplace/i/your-publisher.regex-replace-plus.svg)](https://marketplace.visualstudio.com/items?itemName=LRainner.regex-replace-plus)
 
 **Regex Replace Plus** 是一款为 VS Code 设计的增强型替换工具，它允许你使用正则表达式匹配文本，并将其替换为包含自增序列的内容。
 
