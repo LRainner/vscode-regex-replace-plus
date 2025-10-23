@@ -29,7 +29,7 @@ textarea {
     border: 1px solid var(--vscode-input-border);
     background-color: var(--vscode-input-background);
     color: var(--vscode-input-foreground);
-    box-sizing: border-box; /* 保证 padding 不会撑大宽度 */
+    box-sizing: border-box;
 }
 
 textarea {
@@ -38,16 +38,34 @@ textarea {
 
 button {
     width: 100%;
-    padding: 8px;
-    border: none;
-    background-color: var(--vscode-button-background);
-    color: var(--vscode-button-foreground);
+    padding: 8px 12px;
+    border: 1px solid transparent;
+    border-radius: 2px;
+    background-color: var(--vscode-button-background, #007acc);
+    color: var(--vscode-button-foreground, white);
     cursor: pointer;
     text-align: center;
+    outline: none;
+    transition: all 0.15s ease-out;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+    font-size: var(--vscode-font-size);
 }
 
 button:hover {
-    background-color: var(--vscode-button-hover-background);
+    background-color: var(--vscode-button-hover-background, #005a9e);
+    border-color: var(--vscode-button-border, transparent);
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2);
+}
+
+button:focus {
+    border-color: var(--vscode-focusBorder, #007acc);
+    box-shadow: 0 0 0 1px var(--vscode-focusBorder, #007acc);
+}
+
+button:active {
+    background-color: var(--vscode-button-background, #007acc);
+    transform: translateY(1px);
+    box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.1);
 }
 
 .error-message {

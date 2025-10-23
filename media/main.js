@@ -28,6 +28,9 @@ replaceInput.addEventListener('input', () => {
 
 // 4. 监听按钮的点击事件
 replaceAllButton.addEventListener('click', () => {
+    // 添加焦点效果
+    replaceAllButton.focus();
+    
     vscode.postMessage({
         command: 'replaceAll',
         regex: regexInput.value,
