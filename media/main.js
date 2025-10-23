@@ -7,6 +7,8 @@ const vscode = acquireVsCodeApi();
 const regexInput = document.getElementById('regex-input');
 const replaceInput = document.getElementById('replace-input');
 const replaceAllButton = document.getElementById('replace-all-btn');
+const errorMessage = document.getElementById('error-message');
+const matchCount = document.getElementById('match-count');
 
 // 3. 监听输入框的输入事件
 regexInput.addEventListener('input', () => {
@@ -31,4 +33,23 @@ replaceAllButton.addEventListener('click', () => {
         regex: regexInput.value,
         replaceValue: replaceInput.value
     });
+});
+
+// 监听插件发来的消息
+window.addEventListener('message', event => {
+    const message = event.data;
+    
+    switch (message.command) {
+        case 'setError':
+            if (message.value) {
+                errorMessage.textContent = message.value;
+                errorMessage.classList.remove('hidden');
+            } else {
+                errorMessage.classList.add('hidden');
+            }
+            break;
+        case 'setMatchCount':
+            matchCount.textContent = `匹配项: ${message.value}`;
+            break;
+    }
 });

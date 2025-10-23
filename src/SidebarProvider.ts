@@ -6,6 +6,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
   private _previewDecorationType: vscode.TextEditorDecorationType;
   private _regex: string = '';
   private _replaceValue: string = '';
+  private _matchCount: number = 0;
   private readonly _extensionUri: vscode.Uri;
 
   public static readonly viewId = 'regexReplacePlusSidebar';
@@ -87,6 +88,10 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
                 <label for="replace-input">替换为</label>
                 <textarea id="replace-input" rows="3" placeholder="输入替换内容, e.g., item_{{i:1}}"></textarea>
             </div>
+            <div class="info-group">
+                <div id="match-count">匹配项: 0</div>
+                <div id="error-message" class="error-message hidden"></div>
+            </div>
             <button id="replace-all-btn">全部替换</button>
         </div>
         <script nonce="${nonce}" src="${scriptUri}"></script>
@@ -102,12 +107,15 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         editor.setDecorations(this._decorationType, []);
         editor.setDecorations(this._previewDecorationType, []);
       }
+      this._matchCount = 0;
+      this._updateWebviewInfo();
       return;
     }
 
     const text = editor.document.getText();
     const highlightDecorations: vscode.DecorationOptions[] = [];
     const previewDecorations: vscode.DecorationOptions[] = [];
+    let matchCount = 0;
 
     try {
       const regex = new RegExp(this._regex, 'g');
@@ -131,12 +139,33 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
             },
           });
         }
+        matchCount++;
       }
       editor.setDecorations(this._decorationType, highlightDecorations);
       editor.setDecorations(this._previewDecorationType, previewDecorations);
+      
+      this._matchCount = matchCount;
+      this._updateWebviewInfo();
     } catch (e) {
       editor.setDecorations(this._decorationType, []);
       editor.setDecorations(this._previewDecorationType, []);
+      
+      this._matchCount = 0;
+      this._updateWebviewInfo(e instanceof Error ? e.message : String(e));
+    }
+  }
+
+  private _updateWebviewInfo(errorMessage?: string) {
+    if (this._view) {
+      this._view.webview.postMessage({
+        command: 'setMatchCount',
+        value: this._matchCount
+      });
+      
+      this._view.webview.postMessage({
+        command: 'setError',
+        value: errorMessage || ''
+      });
     }
   }
 
@@ -178,6 +207,24 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         const range = new vscode.Range(startPos, endPos);
         const newText = replacer(match);
         edits.push(vscode.TextEdit.replace(range, newText));
+      }
+
+      // 如果没有匹配项，显示提示信息
+      if (edits.length === 0) {
+        vscode.window.showInformationMessage('没有找到匹配项');
+        return;
+      }
+
+      // 添加确认对话框
+      const confirm = await vscode.window.showWarningMessage(
+        `确定要替换 ${edits.length} 个匹配项吗?`, 
+        { modal: true }, 
+        '确定', 
+        '取消'
+      );
+      
+      if (confirm !== '确定') {
+        return;
       }
 
       const workspaceEdit = new vscode.WorkspaceEdit();

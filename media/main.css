@@ -49,3 +49,27 @@ button {
 button:hover {
     background-color: var(--vscode-button-hover-background);
 }
+
+.error-message {
+    color: var(--vscode-errorForeground);
+    background-color: var(--vscode-inputValidation-errorBackground);
+    border: 1px solid var(--vscode-inputValidation-errorBorder);
+    padding: 8px;
+    border-radius: 2px;
+    font-size: var(--vscode-font-size);
+}
+
+.error-message.hidden {
+    display: none;
+}
+
+.info-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+#match-count {
+    font-size: var(--vscode-font-size);
+    color: var(--vscode-descriptionForeground);
+}
