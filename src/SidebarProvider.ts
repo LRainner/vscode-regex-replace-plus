@@ -5,6 +5,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
   private _matchDecorationType: vscode.TextEditorDecorationType;
   private _matchWithReplaceDecorationType: vscode.TextEditorDecorationType;
   private _previewDecorationType: vscode.TextEditorDecorationType;
+  private _isViewVisible: boolean = false;
   private _regex: string = '';
   private _replaceValue: string = '';
   private _matchCount: number = 0;
@@ -49,6 +50,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
     };
 
     webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
+    this._isViewVisible = webviewView.visible;
 
     // 从 workspaceState 读取初始值并推送到 Webview，便于重建后进行状态恢复
     const initialRegex = this.context.workspaceState.get<string>('rrp.regex', this._regex);
@@ -59,14 +61,23 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
       replaceValue: initialReplace || ''
     });
 
-    // 视图可见性变化时，主动同步当前扩展端状态
+    // 视图可见性变化时：隐藏则清空装饰；显示则恢复并重新计算
     webviewView.onDidChangeVisibility(() => {
-      if (webviewView.visible) {
+      this._isViewVisible = webviewView.visible;
+      if (this._isViewVisible) {
         webviewView.webview.postMessage({
           command: 'initState',
           regex: this._regex || '',
           replaceValue: this._replaceValue || ''
         });
+        this._updateDecorations();
+      } else {
+        const editor = vscode.window.activeTextEditor;
+        if (editor) {
+          editor.setDecorations(this._matchDecorationType, []);
+          editor.setDecorations(this._matchWithReplaceDecorationType, []);
+          editor.setDecorations(this._previewDecorationType, []);
+        }
       }
     });
 
@@ -140,6 +151,14 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
       }
       this._matchCount = 0;
       this._updateWebviewInfo();
+      return;
+    }
+
+    // 视图不可见时不显示任何匹配/预览（切换到其它插件时自动隐藏）
+    if (!this._isViewVisible) {
+      editor.setDecorations(this._matchDecorationType, []);
+      editor.setDecorations(this._matchWithReplaceDecorationType, []);
+      editor.setDecorations(this._previewDecorationType, []);
       return;
     }
 
