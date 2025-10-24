@@ -2,7 +2,8 @@ import * as vscode from 'vscode';
 
 export class SidebarProvider implements vscode.WebviewViewProvider {
   private _view?: vscode.WebviewView;
-  private _decorationType: vscode.TextEditorDecorationType;
+  private _matchDecorationType: vscode.TextEditorDecorationType;
+  private _matchWithReplaceDecorationType: vscode.TextEditorDecorationType;
   private _previewDecorationType: vscode.TextEditorDecorationType;
   private _regex: string = '';
   private _replaceValue: string = '';
@@ -14,16 +15,23 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
   constructor(private readonly context: vscode.ExtensionContext) {
     this._extensionUri = context.extensionUri;
 
-    this._decorationType = vscode.window.createTextEditorDecorationType({
-      backgroundColor: 'rgba(255, 255, 0, 0.3)',
-      border: '1px solid rgba(255, 255, 0, 0.5)',
+    // 仅查找：匹配项背景高亮（无删除线）
+    this._matchDecorationType = vscode.window.createTextEditorDecorationType({
+      backgroundColor: new vscode.ThemeColor('editor.findMatchHighlightBackground'),
     });
 
+    // 预览替换：匹配项背景高亮 + 删除线（仅在有替换值时使用）
+    this._matchWithReplaceDecorationType = vscode.window.createTextEditorDecorationType({
+      backgroundColor: new vscode.ThemeColor('editor.findMatchHighlightBackground'),
+      textDecoration: 'line-through',
+    });
+
+    // 新值预览：紧挨着原文本显示，使用插入色背景区分
     this._previewDecorationType = vscode.window.createTextEditorDecorationType({
       after: {
-        color: 'rgba(153, 153, 153, 0.7)',
-        fontStyle: 'italic',
-        margin: '0 0 0 1em',
+        color: new vscode.ThemeColor('editor.foreground'),
+        margin: '0',
+        textDecoration: "none; background-color: var(--vscode-diffEditor-insertedTextBackground); border-radius: 2px; padding: 0 2px;",
       },
     });
   }
@@ -104,7 +112,8 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
     const editor = vscode.window.activeTextEditor;
     if (!editor || !this._regex) {
       if (editor) {
-        editor.setDecorations(this._decorationType, []);
+        editor.setDecorations(this._matchDecorationType, []);
+        editor.setDecorations(this._matchWithReplaceDecorationType, []);
         editor.setDecorations(this._previewDecorationType, []);
       }
       this._matchCount = 0;
@@ -134,20 +143,28 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
             range,
             renderOptions: {
               after: {
-                contentText: ` -> ${previewText}`,
+                contentText: `${previewText.length > 60 ? previewText.slice(0, 57) + '…' : previewText}`,
               },
             },
           });
         }
         matchCount++;
       }
-      editor.setDecorations(this._decorationType, highlightDecorations);
+      // 先清空，避免状态切换时残留样式
+      editor.setDecorations(this._matchDecorationType, []);
+      editor.setDecorations(this._matchWithReplaceDecorationType, []);
+      if (this._replaceValue) {
+        editor.setDecorations(this._matchWithReplaceDecorationType, highlightDecorations);
+      } else {
+        editor.setDecorations(this._matchDecorationType, highlightDecorations);
+      }
       editor.setDecorations(this._previewDecorationType, previewDecorations);
       
       this._matchCount = matchCount;
       this._updateWebviewInfo();
     } catch (e) {
-      editor.setDecorations(this._decorationType, []);
+      editor.setDecorations(this._matchDecorationType, []);
+      editor.setDecorations(this._matchWithReplaceDecorationType, []);
       editor.setDecorations(this._previewDecorationType, []);
       
       this._matchCount = 0;
