@@ -12,22 +12,61 @@ const matchCount = document.getElementById('match-count');
 
 // 页面加载完成后自动聚焦到查找输入框
 window.addEventListener('load', () => {
+    const state = typeof vscode.getState === 'function' ? vscode.getState() : {};
+    if (state && typeof state === 'object') {
+        if (typeof state.regex === 'string') {
+            regexInput.value = state.regex;
+        }
+        if (typeof state.replaceValue === 'string') {
+            replaceInput.value = state.replaceValue;
+        }
+    }
+    // 首次加载主动同步到扩展端，驱动装饰刷新
+    vscode.postMessage({ command: 'regexUpdate', value: regexInput.value || '' });
+    vscode.postMessage({ command: 'replaceValueUpdate', value: replaceInput.value || '' });
     regexInput.focus();
 });
 
-// 3. 监听输入框的输入事件
-regexInput.addEventListener('input', () => {
+// 3. 监听输入框的输入事件（带防抖并持久化 Webview 状态）
+const debounce = (fn, delay = 120) => {
+    let t;
+    return (...args) => {
+        clearTimeout(t);
+        t = setTimeout(() => fn(...args), delay);
+    };
+};
+
+const syncState = () => {
+    if (typeof vscode.setState === 'function') {
+        vscode.setState({
+            regex: regexInput.value || '',
+            replaceValue: replaceInput.value || ''
+        });
+    }
+};
+
+const sendRegexUpdate = debounce(() => {
+    syncState();
     vscode.postMessage({
         command: 'regexUpdate',
-        value: regexInput.value
+        value: regexInput.value || ''
     });
+}, 120);
+
+const sendReplaceUpdate = debounce(() => {
+    syncState();
+    vscode.postMessage({
+        command: 'replaceValueUpdate',
+        value: replaceInput.value || ''
+    });
+}, 120);
+
+regexInput.addEventListener('input', () => {
+    sendRegexUpdate();
 });
 
 replaceInput.addEventListener('input', () => {
-    vscode.postMessage({
-        command: 'replaceValueUpdate',
-        value: replaceInput.value
-    });
+    sendReplaceUpdate();
 });
 
 
@@ -48,6 +87,24 @@ window.addEventListener('message', event => {
     const message = event.data;
     
     switch (message.command) {
+        case 'initState':
+            // 来自扩展端的初始化状态，用于 Webview 重建后的恢复
+            if (typeof message.regex === 'string') {
+                regexInput.value = message.regex;
+            }
+            if (typeof message.replaceValue === 'string') {
+                replaceInput.value = message.replaceValue;
+            }
+            // 同步到 webview state，并触发一次更新以刷新高亮/预览
+            if (typeof vscode.setState === 'function') {
+                vscode.setState({
+                    regex: regexInput.value || '',
+                    replaceValue: replaceInput.value || ''
+                });
+            }
+            vscode.postMessage({ command: 'regexUpdate', value: regexInput.value || '' });
+            vscode.postMessage({ command: 'replaceValueUpdate', value: replaceInput.value || '' });
+            break;
         case 'setError':
             if (message.value) {
                 errorMessage.textContent = message.value;

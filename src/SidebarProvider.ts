@@ -50,14 +50,36 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 
     webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
 
+    // 从 workspaceState 读取初始值并推送到 Webview，便于重建后进行状态恢复
+    const initialRegex = this.context.workspaceState.get<string>('rrp.regex', this._regex);
+    const initialReplace = this.context.workspaceState.get<string>('rrp.replace', this._replaceValue);
+    webviewView.webview.postMessage({
+      command: 'initState',
+      regex: initialRegex || '',
+      replaceValue: initialReplace || ''
+    });
+
+    // 视图可见性变化时，主动同步当前扩展端状态
+    webviewView.onDidChangeVisibility(() => {
+      if (webviewView.visible) {
+        webviewView.webview.postMessage({
+          command: 'initState',
+          regex: this._regex || '',
+          replaceValue: this._replaceValue || ''
+        });
+      }
+    });
+
     webviewView.webview.onDidReceiveMessage(async (message) => {
       switch (message.command) {
         case 'regexUpdate':
           this._regex = message.value;
+          await this.context.workspaceState.update('rrp.regex', this._regex);
           this._updateDecorations();
           return;
         case 'replaceValueUpdate':
           this._replaceValue = message.value;
+          await this.context.workspaceState.update('rrp.replace', this._replaceValue);
           this._updateDecorations();
           return;
         case 'replaceAll':
