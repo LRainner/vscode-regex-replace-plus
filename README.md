@@ -5,7 +5,7 @@
 
 **Regex Replace Plus** 是一款为 VS Code 设计的增强型替换工具，它允许你使用正则表达式匹配文本，并将其替换为包含自增序列的内容。
 
-![插件截图预览](https://raw.githubusercontent.com/LRainner/Pic/main/img/ec715deae71b65c960cb4c3988b9802a.png)
+![插件截图预览](https://raw.githubusercontent.com/LRainner/Pic/main/img/1e4e437b90d62c6a7ea5f4e62bd72e82.png)
 
 ## ✨ 核心功能
 
